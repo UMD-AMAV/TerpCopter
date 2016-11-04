@@ -27,3 +27,20 @@
 *.exe
 *.out
 *.app
+
+# Vim Temporary Files
+*~
+
+# Vim Swap Files
+*.swp
+*.swo
+
+# Catkin & CMake Cache Folders
+build/
+build_isolated/
+
+# Catkin Built Target Storage Folders
+devel/
+devel_isolated/
+
+
