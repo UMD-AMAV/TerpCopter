@@ -95,6 +95,11 @@ script:
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
 
+# Do static code analysis with codecov after build succeeds
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 # Send notifications to terpcopter-software channel in AMAV2017 slack group
 notifications:
   slack: amav2017:Iuhf0YIWdQVh0NKrEXsJMFeg
+
