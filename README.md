@@ -1,4 +1,4 @@
-# TerpCopter
+# TerpCopter [![Build Status](https://travis-ci.org/UMD-AMAV/TerpCopter.svg?branch=master)](https://travis-ci.org/UMD-AMAV/TerpCopter)
 University of Maryland's Autopilot Software for Autonomous-Micro Aerial Vehicles (A-MAV) Competition hosted by American Helicopter Society (AHS)
 
 ## Reference Guides
