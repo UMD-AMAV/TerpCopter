@@ -1,0 +1,12 @@
+<launch>
+  <env name="ROSCONSOLE_CONFIG_FILE"
+      value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
+
+  <!-- Include offboard control driver -->
+  <node name="terpcopter_manager" pkg="terpcopter_controller" type="terpcopter_manager" output="screen"/>
+
+  <param name="terpcopter_manager_running" type="bool" value="1" />
+
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->
