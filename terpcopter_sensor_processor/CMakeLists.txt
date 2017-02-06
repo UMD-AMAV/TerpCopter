@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  terpcopter_common
 )
 
 ## System dependencies are found with CMake's conventions
@@ -68,6 +69,7 @@ find_package(catkin REQUIRED COMPONENTS
 # generate_messages(
 #   DEPENDENCIES
 #   std_msgs
+#   terpcopter_common
 # )
 
 ################################################
@@ -115,29 +117,21 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  inc
 )
 
-## Declare a C++ library
-# add_library(terpcopter_sensor_processor
-#   src/${PROJECT_NAME}/terpcopter_sensor_processor.cpp
-# )
+## Declare a C++ executable
+add_executable(terpcopter_localizer
+ src/terpcopter_localizer.cpp
+)
 
 ## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_sensor_processor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-# add_executable(terpcopter_sensor_processor_node src/terpcopter_sensor_processor_node.cpp)
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(terpcopter_sensor_processor_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(terpcopter_localizer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(terpcopter_sensor_processor_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(terpcopter_localizer
+ ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

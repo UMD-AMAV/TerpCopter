@@ -1,0 +1,11 @@
+Nodes:
+All nodes spawned by terpcopter_controller will set param
+of the following form
+  name -> system_name_running
+  field -> bool running
+All nodes spawned by terpcopter_controller will publish health
+message of the following form
+  name -> system_name_health
+  field -> string system
+  field -> int8 health
+  field -> time

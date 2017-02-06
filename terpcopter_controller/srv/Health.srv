@@ -1,0 +1,8 @@
+# service message
+uint8 sys
+bool health_req
+
+---
+
+# client message
+bool health_resp

@@ -1,0 +1,19 @@
+<launch>
+  <arg name="sim" default="false"/>
+  <arg name="mav_name" default="firefly"/>
+
+  <env name="ROSCONSOLE_CONFIG_FILE"
+      value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
+
+  <!-- Include offboard control driver -->
+  <include file="$(find terpcopter_controller)/launch/controller.launch" />
+  <!-- 
+  <node name="terpcopter_controller" pkg="terpcopter_controller" type="terpcopter_controller" output="screen"/>
+    -->
+
+  <group if="$(arg sim)">
+    <include file="$(find terpcopter_simulator)/launch/terpcopter_basic_sitl.launch"/>
+  </group>
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->

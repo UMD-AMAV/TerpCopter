@@ -1,0 +1,12 @@
+<launch>
+  <env name="ROSCONSOLE_CONFIG_FILE"
+      value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
+
+  <!-- Include offboard control driver -->
+  <node name="terpcopter_localizer" pkg="terpcopter_sensor_processor" type="terpcopter_localizer" output="screen"/>
+
+  <param name="terpcopter_localizer_running" type="bool" value="1" />
+
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->
