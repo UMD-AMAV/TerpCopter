@@ -1,7 +1,5 @@
 #pragma once
 
-#include <terpcopter_common/Health.h>
-
 #include <string>
 #include <map>
 #include <ros/node_handle.h>

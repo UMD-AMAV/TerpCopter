@@ -11,5 +11,5 @@ terpcopter_controller terpcopter_manager
 terpcopter_controller terpcopter_controller
 
 # Drone localization
-terpcopter_sensor_processor terpcopter_localizer
+#terpcopter_sensor_processor terpcopter_localizer
 
