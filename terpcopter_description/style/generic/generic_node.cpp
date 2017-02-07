@@ -6,7 +6,6 @@
 #include <ros/package.h>
 #include <signal.h>
 #include <string>
-#include <stdio.h>
 #include <terpcopter_common/system.h>
 #include <terpcopter_localizer.h>
 
@@ -47,8 +46,15 @@ int main(int argc, char **argv) {
     rate.sleep();
   }
 
+  //FIXME Cleanup section not running correctly
   // Cleanup
-  
+
+  ROS_INFO("here");
+  fflush(stdout);
+  localizer.nh.setParam(
+    strcat(strcat(strcpy(localizer_node_param, "/"),
+    LOCALIZER_NODE),"_running"), false);
+
   return SUCCESS;
 }
 
@@ -66,7 +72,7 @@ int8_t TerpCopterLocalizer::check_health() {
 }
 
 void TerpCopterLocalizer::health_pub_cb(const ros::TimerEvent&) {
-  health.health = check_health();
-  health.t = ros::Time::now();
-  health_pub.publish(health);
+    health.health = check_health();
+    health.t = ros::Time::now();
+    health_pub.publish(health);
 }
