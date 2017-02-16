@@ -5,6 +5,10 @@
   <arg name="enable_ground_truth" default="true"/>
   <arg name="log_file" default="$(arg mav_name)"/>
 
+  <!-- FIXME how to manage simulator if can only be started with 
+       make command?
+       simulator_manager node (how to manage that?)? -->
+
   <!-- Launched correctly with:
        $ make posix_sitl_default gazebo
        $ roslaunch mavros px4.launch fcu_url:=udp://:14540@14557

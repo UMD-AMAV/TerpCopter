@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <map>
 #include <ros/node_handle.h>
 #include <ros/ros.h>
@@ -15,17 +16,48 @@
 #define DESC_COMMENT_CHAR '#'
 
 // Define parent system
-#define PARENT_SYS "terpcopter_manager"
+//#define PARENT_SYS "terpcopter_manager"
 
 // Define health parameters
 #define HEALTHY 0
 #define RESTART_SYS -1
 #define STOP_SYS -2
 
+// Define max number of commands allowed for a start or end command
+#define MAX_WRD_LEN 80 
+
 struct system_s {
+public:
   std::string name;
-  ros::Subscriber sub;
+  std::string pkg;
+  /*
+  char *start_cmd[MAX_WRD_LEN];
+  char *end_cmd[MAX_WRD_LEN];
+  */
+  char **start_cmd=NULL;
+  char **end_cmd=NULL;
+  bool ros;
+
+  // Constructors
+  system_s();
+  system_s(std::string nm, std::string pack,
+      char **st_cmd, char **nd_cmd, bool is_ros);
+  system_s(const system_s &sys);
+
+  static void free_sys(system_s &sys);
+  bool equals(const system_s &cmp);
+  void print() const;
+  
+private:
+  void alloc_cmds(char **st_cmd, char **nd_cmd);
 };
+
+int wrd_list_to_string(std::string &s, char **wrds);
+
+bool wrd_array_equal(char const **lhs, char const **rhs);
+bool wrd_array_equal(char *const *lhs, char *const *rhs);
+
+bool operator==(const system_s &lhs, const system_s &rhs);
 
 // Global message threshold time to determine if message is relevant
 extern const ros::Duration msg_threshold;

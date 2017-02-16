@@ -6,24 +6,23 @@
 #include <ros/ros.h>
 #include <string>
 #include <terpcopter_common/common.h>
+#include <terpcopter_common/tc_node.h>
 
 #define LOCALIZER_NODE "terpcopter_localizer"
 
 // TODO create variable with localized state
 
-class TerpCopterLocalizer {
+class TerpCopterLocalizer : public TCNode {
 
   public:
+    int tmp;
 
-    ros::NodeHandle nh;
-
-    terpcopter_common::Health health;
-
-    ros::Publisher health_pub;
-
-    void health_pub_cb(const ros::TimerEvent&);
-
+    // Constructors
+    TerpCopterLocalizer(std::string &nm);
+    TerpCopterLocalizer(const char *nm);
+    
   private:
+
     // Check health of all systems
-    int8_t check_health();
+    virtual int8_t check_health();
 };

@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
         ros::console::levels::Debug))
     ros::console::notifyLoggerLevelsChanged();
 
-  TerpCopterController controller;
+  // Converting constructor
+  TerpCopterController controller(CONTROLLER_NODE);
   char controller_node_param[256];
 
   controller.nh.setParam(
@@ -41,7 +42,8 @@ int main(int argc, char **argv) {
 
   // Create timers
   ros::Timer health_timer = controller.nh.createTimer(
-      ros::Duration(.1), &TerpCopterController::health_pub_cb, &controller);
+      ros::Duration(.1), &TCNode::health_pub_cb,
+      dynamic_cast<TCNode *> (&controller));
  
   while(!ros::isShuttingDown()){
     ros::spinOnce();
@@ -119,23 +121,21 @@ int main(int argc, char **argv) {
   return SUCCESS;
 }
 
+// Constructors
+TerpCopterController::TerpCopterController(std::string &nm) :
+  TCNode(nm)
+{
+}
+
+TerpCopterController::TerpCopterController(const char *nm) :
+  TCNode(nm)
+{
+}
+
 //TODO
 // Check health of all systems
 int8_t TerpCopterController::check_health() {
-//DEBUG
-#include <cstdlib>
-  int ran = std::rand() % 100;
-  // Return ERROR on 5% of cases
-  if (ran >= 5 )
-    return SUCCESS;
-  else
-    return RESTART_SYS;
-}
-
-void TerpCopterController::health_pub_cb(const ros::TimerEvent&) {
-  health.health = check_health();
-  health.t = ros::Time::now();
-  health_pub.publish(health);
+  return SUCCESS;
 }
 
 void TerpCopterController::mavros_state_cb(
