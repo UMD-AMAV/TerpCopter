@@ -115,6 +115,8 @@ include_directories(include)
 ## Declare a C++ library
 add_library(terpcopter_common
   src/${PROJECT_NAME}/system.cpp
+  src/${PROJECT_NAME}/tc_node.cpp
+  src/${PROJECT_NAME}/tc_manager_node.cpp
 )
 
 ## Add cmake target dependencies of the library

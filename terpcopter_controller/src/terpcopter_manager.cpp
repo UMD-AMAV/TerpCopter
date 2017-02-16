@@ -9,8 +9,7 @@
 #include <ros/console.h>
 #include <ros/package.h>
 #include <string>
-#include <terpcopter_manager.h>
-
+#include <terpcopter_manager.h> 
 using namespace std;
 
 TerpCopterManager *manager=NULL;
@@ -22,18 +21,13 @@ int main(int argc, char **argv) {
         ros::console::levels::Debug))
     ros::console::notifyLoggerLevelsChanged();
 
-  manager = new TerpCopterManager();
+  manager = new TerpCopterManager(MANAGER_NODE);
   
   char manager_node_param[256];
 
   manager->nh.setParam(
     strcat(strcpy(manager_node_param,MANAGER_NODE),"_running"),
     true);
-
-  /* Necessary any more?
-  // Define custom sigint handler
-  signal(SIGINT, sigIntHandler);
-  */
 
   // Define initial list of messages, actions, services
   manager->health.system = MANAGER_NODE;
@@ -45,7 +39,8 @@ int main(int argc, char **argv) {
 
   // Create timers
   ros::Timer health_timer = manager->nh.createTimer(
-      ros::Duration(.1), &TerpCopterManager::health_pub_cb, manager);
+      ros::Duration(.1), &TCNode::health_pub_cb,
+      dynamic_cast<TCNode *> (manager));
 
   // read mission_plan.txt and terpcopter_systems.txt
   string terpcopter_mission_path = ros::package::getPath("terpcopter_description") + "/mission/";
@@ -53,23 +48,19 @@ int main(int argc, char **argv) {
   string terpcopter_mission_file = terpcopter_mission_path+MISSION_PLAN_FILE;
 
   // initialize systems from systems file 
-  manager->initialize_systems(terpcopter_systems_file);
+  vector<string> v;
+  v.push_back(terpcopter_systems_file);
+  manager->initialize_systems(v);
   sleep(1);
 
   manager->check_systems();
-  
-  //DEBUG
-  manager->remove_system("terpcopter_localizer");
-  manager->add_system("terpcopter_sensor_processor",
-      "terpcopter_localizer");
-
-  ROS_DEBUG("Entering %s main loop",MANAGER_NODE);
+   ROS_DEBUG("Entering %s main loop",MANAGER_NODE);
   while(!ros::isShuttingDown()){
     ros::spinOnce();
     rate.sleep();
   }
 
-  //FIXME not running b/c ROS kills connection with master
+  //FIXME not running correctly b/c ROS kills connection with master
   // during shutdown
   // For now, ROS backend stuff will handle teardown
   manager->teardown_systems();
@@ -78,30 +69,27 @@ int main(int argc, char **argv) {
   return SUCCESS;
 }
 
-// Constructor
-TerpCopterManager::TerpCopterManager(void) {
-  sys_idx = 0;
+// Constructors
+TerpCopterManager::TerpCopterManager(std::string &nm) :
+  TCManagerNode(nm)
+{
 }
 
-/*
-void sigIntHandler(int sig) {
-  manager->teardown_systems();
-
-  delete manager;
-  ros::shutdown();
+TerpCopterManager::TerpCopterManager(const char *nm) :
+  TCManagerNode(nm)
+{
 }
-*/
 
 // Start systems and subscribe to health of all nodes listed
 // Health messages will be named health_system_name
 int TerpCopterManager::initialize_systems(
-    const std::string &sys_list) {
-  ifstream sys_file(sys_list.c_str());
-  string line, sys_pkg,
-         sys_name, delim = " ";
+    const std::vector<std::string> &sys_list) {
+  ifstream sys_file(sys_list.front().c_str());
+  string line, sys_pkg, sys_name, delim = " ";
   size_t pos = 0;
   int i;
 
+  ROS_DEBUG("Initializing systems from %s manager", name.c_str());
   while (getline(sys_file, line)) {
     // Check if line is part of systems or is comment/empty line
     if (check_line(line) < 0) continue;
@@ -123,32 +111,33 @@ int TerpCopterManager::initialize_systems(
       line.erase(0,pos+delim.length());
     }
 
-    if (add_system(sys_pkg,sys_name) < 0) {
+    // FIXME Dirty dirty conversions to get rid of casting errors
+    char nm[256],pack[256],sys_name_ns[256];
+    strcpy(nm,sys_name.c_str());
+    strcpy(pack,sys_pkg.c_str());
+    memset(&sys_name_ns[0],0,
+        sizeof(sys_name_ns)/sizeof(sys_name_ns[0]));
+    strcat(strcat(sys_name_ns,"/"),nm);
+
+    char *start_cmd[] = {"rosrun",pack,nm,NULL};
+    char *end_cmd[] = {"rosnode","kill",sys_name_ns,NULL};
+
+    // Correct way to start a system
+    // Must instantiate system
+    // Then call add_system()
+    // Then call system_s::free_sys() once it is put in the map
+    system_s sys(sys_name,sys_pkg,
+        start_cmd, end_cmd,
+        true);
+
+    if (add_system(sys) < 0) {
       ROS_ERROR("Cannot add system %s %s",
         sys_pkg.c_str(), sys_name.c_str());
       return ERROR;
     }
-  }
 
-  return SUCCESS;
-}
-
-int TerpCopterManager::teardown_systems() {
-  int ret;
-  // Check sys_idx > 1 to avoid re-trying to remove terpcopter_controller
-  ROS_INFO("Tearing down TerpCopter systems");
-  for (std::map<std::string, ros::Subscriber>::iterator it=sys_map.begin(); it!=sys_map.end() && sys_idx > 1; ++it) {
-    ret = remove_system(it->first);
-    if (ret < 0 && it->first.compare(PARENT_SYS)) {
-      ROS_ERROR("Failed to remove system %s from TerpCopter systems",
-        it->first.c_str());
-      return ERROR;
-    } else if (ret < 0) {
-      ROS_ERROR("Cannot remove system %s, as it is the parent system",
-          it->first.c_str());
-    }
-    //TODO unsubscribe from system health message
-    //TODO set system_running params to 0
+    system_s::free_sys(sys);
+    sys_map.find(sys_name)->second.print();
   }
 
   return SUCCESS;
@@ -168,244 +157,7 @@ int TerpCopterManager::check_line(const std::string &line) {
   return SUCCESS;
 }
 
-// Check system map
-// TODO make display in numerical order, currently displays in weird
-// tree order
-int TerpCopterManager::check_systems() {
-  ROS_INFO("List of current systems:");
-  for (std::map<std::string, ros::Subscriber>::iterator it=sys_map.begin(); it!=sys_map.end(); ++it) {
-    ROS_INFO("\tSystem %s",
-        it->first.c_str());
-  }
- 
-  return SUCCESS;
-}
-
 // Check health of all systems
 int8_t TerpCopterManager::check_health() {
   return SUCCESS;
-}
-
-// Looks for system message/service to update systems list
-// TODO stop or restart unhealthy systems
-void TerpCopterManager::health_sub_cb(
-    const terpcopter_common::Health::ConstPtr &msg) {
-  // Determine healthy system or not
-  if (ros::Time::now() - msg->t < msg_threshold) {
-    switch(msg->health) {
-      case HEALTHY:
-        // Do nothing
-        break;
-      case STOP_SYS:
-        ROS_DEBUG("Stopping system %s",msg->system.c_str());
-        if (msg->system.compare(PARENT_SYS)) {
-          remove_system(msg->system);
-        } else { // parent sys
-
-        }
-        break;
-      case RESTART_SYS:
-        ROS_DEBUG("Restarting system %s",msg->system.c_str());
-        if (msg->system.compare(PARENT_SYS)
-            && !remove_system(msg->system)) {
-          add_system(sys_pkg_map[msg->system], msg->system);
-        } else { // parent sys
-
-        }
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-// Add system to system map
-// Cannot add same node twice, but ROS does allow for anonymously named nodes
-// Thus, multiple of the same node can run with different names
-// TODO add in ability to pass params
-// TODO add in ability to start node in namespace
-//      Maybe do this thru launch files
-int TerpCopterManager::add_system(const std::string &sys_pkg,
-    const std::string &sys_name) {
-  int sys_ret;
-  bool b;
-  // Check if system is in map
-  // If in map, return SUCCESS
-  // Else check if system exists and is running
-  // If exists and is not running, launch and add to map
-  // Else if exists and is running, add to map
-  if (sys_map.find(sys_name) == sys_map.end()) {
-    if (nh.hasParam("/"+sys_name+"_running")) {
-      nh.getParam("/"+sys_name+"_running", b);
-
-      if (!b) { // Restarting system 
-        sys_ret = start_sys(sys_pkg, sys_name);
-        sleep(1);
-        nh.getParam("/"+sys_name+"_running", b);
-        if (!sys_ret && b) {
-          ROS_DEBUG("Successfully restarted system %s",
-            sys_name.c_str());
-        } else {
-          ROS_ERROR("Error restarting system %s", sys_name.c_str());
-          return ERROR;
-        }
-      } else {
-        ROS_DEBUG("System %s already running", sys_name.c_str());
-      }
-
-    } else { // Starting system from scratch
-      sys_ret = start_sys(sys_pkg, sys_name);
-
-      sleep(1);
-      nh.getParam("/"+sys_name+"_running", b);
-
-      if (!sys_ret && b) {
-        ROS_DEBUG("Successfully started system %s",
-          sys_name.c_str());
-      } else {
-        ROS_ERROR("Error starting system %s", sys_name.c_str());
-          return ERROR;
-      }
-    }
-
-    ROS_INFO("Adding system %s to TerpCopter systems",
-        sys_name.c_str());
-
-    sys_map.insert(std::pair<std::string, ros::Subscriber>(sys_name,
-      nh.subscribe(
-        sys_name + "_health", 100,
-        &TerpCopterManager::health_sub_cb, this)));
-
-    // increment system index
-    sys_idx++;
-
-    if (sys_pkg_map.find(sys_name) == sys_pkg_map.end()) {
-      sys_pkg_map.insert(std::pair<std::string, std::string>(
-        sys_name, sys_pkg));
-      ROS_DEBUG("inserted %s %s",
-        sys_pkg_map[sys_name].c_str(), sys_name.c_str());
-    }
-
-  } else {
-    ROS_WARN("%s already in TerpCopter systems", sys_name.c_str());
-    return ERROR;
-  }
-  
-  return SUCCESS;
-}
-
-// Remove system from system map
-int TerpCopterManager::remove_system(const std::string &sys_name) {
-  int sys_ret;
-  bool b;
-  // Check if system is in map and is running
-  // If in map, remove
-  // If not in map, return ERROR
-  if (sys_map.find(sys_name) != sys_map.end()) {
-    // TODO check if node is running
-    // TODO kill node
-    if (nh.hasParam("/"+sys_name+"_running")) {
-      nh.getParam("/"+sys_name+"_running", b);
-
-      if (b && !sys_name.compare(PARENT_SYS)) {
-        ROS_ERROR("Cannot kill %s this way, as it is the parent system",
-          sys_name.c_str());
-        return ERROR;
-      } else if (b) {
-        sys_ret = end_sys(sys_name);
-        if (!sys_ret) {
-
-          //FIXME take this out once shutdown section of nodes is workign
-          // Set system to no longer be running
-          nh.setParam(("/"+sys_name+"_running"), false);
-          
-          ROS_DEBUG("Successfully killed system %s", sys_name.c_str()); 
-        } else {
-          ROS_ERROR("Error killing system %s", sys_name.c_str());
-          return ERROR;
-        }
-      } else {
-        ROS_DEBUG("System %s not running",sys_name.c_str());
-      }
-    }
-
-    ROS_INFO("Removing %s from TerpCopter systems",
-        sys_name.c_str());
-    sys_map.erase(sys_name);
-    
-    // Don't erase node names so that they can be restarted
-    // sys_pkg_map.erase(sys_name);
-
-    if (--sys_idx < 0) {
-      ROS_ERROR("Number of systems < 0");
-      return ERROR;
-    }
-
-  } else {
-    ROS_WARN("Cannot remove %s: not in TerpCopter systems", sys_name.c_str());
-    return ERROR;
-  }
-
-  return SUCCESS;
-}
-
-// Start system thru ros
-int TerpCopterManager::start_sys(const std::string &sys_pkg,
-    const std::string &sys_name) {
-    pid_t pid;
-
-    fflush(stdout);
-    fflush(stderr);
-
-    pid = fork();
-    if (pid == 0) {
-      ROS_DEBUG("Child process pid %u\nSystem %s %s",
-          getpid(),
-          sys_pkg.c_str(), sys_name.c_str());
-
-      //TODO clean this up
-      char pkg[1024], nm[1024];
-      strcpy(pkg, sys_pkg.c_str());
-      strcpy(nm, sys_name.c_str());
-      char *args[] = {"rosrun", pkg,
-                      nm, NULL};
-
-      execvp(args[0],args);
-
-      ROS_ERROR("Could not start system %s %s",
-        sys_pkg.c_str(), sys_name.c_str());
-
-      exit(EXIT_FAILURE);
-
-    } else if (pid > 0) {
-      ROS_DEBUG("Started child process pid %u\n\
-for system %s %s",
-          pid,
-          sys_pkg.c_str(), sys_name.c_str());
-      
-    } else {
-      return ERROR;
-    }
-  
-    return SUCCESS;
-}
-
-// End system thru ros
-int TerpCopterManager::end_sys(const std::string &sys_name) {
-  int sys_ret;
-
-  sys_ret = system(("rosnode kill /" + sys_name).c_str());
-  if (sys_ret < 0) {
-    ROS_ERROR("Unable to end system %s",
-      sys_name.c_str());
-    return ERROR;
-  }
-  
-  return SUCCESS;
-}
-
-void TerpCopterManager::health_pub_cb(const ros::TimerEvent&) {
-    health.health = check_health();
-    health.t = ros::Time::now();
-    health_pub.publish(health);
 }

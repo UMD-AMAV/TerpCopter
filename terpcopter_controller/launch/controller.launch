@@ -1,10 +1,21 @@
 <launch>
+  <arg name="sim" default="false"/>
+  <arg name="mav_name" default="firefly"/>
+  <arg name="launch-prefix" default=" " />
+
   <env name="ROSCONSOLE_CONFIG_FILE"
       value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
 
-  <!-- Include offboard control driver -->
-  <node name="terpcopter_manager" pkg="terpcopter_controller" type="terpcopter_manager" output="screen"/>
+  <!-- Start simulator manager -->
+  <group if="$(arg sim)">
+    <include file="$(find terpcopter_simulator)/launch/terpcopter_sitl_manager.launch"/>
+    <param name="terpcopter_sitl_manager_running" type="bool" value="1" />
+  </group>
 
+  <!-- Include offboard control driver -->
+  <node name="terpcopter_manager" pkg="terpcopter_controller"
+      type="terpcopter_manager" output="screen"
+      launch-prefix="$(arg launch-prefix)" />
   <param name="terpcopter_manager_running" type="bool" value="1" />
 
 </launch>
