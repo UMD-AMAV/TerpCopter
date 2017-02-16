@@ -1,0 +1,50 @@
+//
+// THIS HEADER FILE CONTAINS THE DECLARATION OF THE VARIABLES OF 
+// THE TERPCOPTER_LOCALIZATION_NODE
+//
+// COPYRIGHT BELONGS TO THE AUTHOR OF THIS CODE
+//
+// AUTHOR : LAKSHMAN KUMAR
+// AFFILIATION : UNIVERSITY OF MARYLAND, MARYLAND ROBOTICS CENTER
+// EMAIL : LKUMAR93@TERPMAIL.UMD.EDU
+// LINKEDIN : WWW.LINKEDIN.COM/IN/LAKSHMANKUMAR1993
+//
+// THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THE GPLv3 LICENSE
+// THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF
+// THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS 
+// PROHIBITED.
+// 
+// BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO
+// BE BOUND BY THE TERMS OF THIS LICENSE. THE LICENSOR GRANTS YOU THE RIGHTS
+// CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND
+// CONDITIONS.
+//
+
+#ifndef TERPCOPTER_LOCALIZATION_NODE_H_
+#define TERPCOPTER_LOCALIZATION_NODE_H_
+
+///////////////////////////////////////////
+//
+//	LIBRARIES
+//
+///////////////////////////////////////////
+
+#include "ros/ros.h"
+#include <terpcopter_comm/OpticalFlow.h>
+#include <geometry_msgs/PointStamped.h>
+
+///////////////////////////////////////////
+//
+//	VARIABLES
+//
+///////////////////////////////////////////
+
+
+ros::Publisher position_pub,linear_velocity_pub;
+
+ros::Subscriber optical_flow_sub;
+
+geometry_msgs::PointStamped position_msg, linear_velocity_msg;
+
+
+#endif // TERPCOPTER_LOCALIZATION_NODE_H_
