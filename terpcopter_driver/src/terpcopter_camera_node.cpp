@@ -163,7 +163,7 @@ int main( int argc, char** argv )
 	
     //If available, get the camera id parameter from the node handle 
     //Else use the default id : 0
-    nh.param<int>("terpcopter_camera_node/forward_camera", camera_id, 0);
+    nh.param<int>("terpcopter_camera_node/forward_camera_id", camera_id, 0);
 
     //Create a publisher for the forward facing camera with the measured calibration paramerers
     CameraPublisher forward_camera_pub("forward", camera_id, FOCAL_LENGTH_X,FOCAL_LENGTH_Y, PRINCIPAL_POINT_X,

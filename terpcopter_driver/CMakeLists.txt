@@ -17,7 +17,11 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   image_transport
   cv_bridge
+  terpcopter_comm
 )
+
+find_package(Boost REQUIRED COMPONENTS thread system signals)
+find_package(Eigen REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -112,8 +116,8 @@ find_package(OpenCV 3.1.0 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES terpcopter_driver
-  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs image_transport
-  DEPENDS system_lib 
+  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs image_transport terpcopter_comm
+  DEPENDS system_lib boost eigen
 )
 
 ###########
@@ -125,8 +129,10 @@ catkin_package(
 
 include_directories(include)
 include_directories(
+  ../terpcopter_libraries/mavlink/include/mavlink/v1.0
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 
@@ -142,22 +148,40 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(terpcopter_driver_node src/terpcopter_driver_node.cpp)
-add_executable(terpcopter_camera_node src/terpcopter_camera.cpp)
+add_executable(terpcopter_camera_node src/terpcopter_camera_node.cpp)
+add_executable(mavlink_serial_client  src/mavlink_serial_comm.cpp src/mavlink_serial_client.cpp)
+add_executable(terpcopter_px4flow_node  src/px4flow_serial_comm.cpp  src/terpcopter_px4flow_node.cpp )
+
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(terpcopter_driver_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(terpcopter_camera_node ${PROJECT_NAME}_EXPORTED_TARGETS ${catkin_EXPORTED_TARGETS})
+add_dependencies(mavlink_serial_client terpcopter_comm_gencpp)
+add_dependencies(terpcopter_px4flow_node terpcopter_comm_gencpp)
+
+
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(terpcopter_driver_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(terpcopter_camera_node  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
+target_link_libraries(mavlink_serial_client   ${catkin_LIBRARIES} )
+target_link_libraries(terpcopter_px4flow_node   ${catkin_LIBRARIES} )
+
 
 #############
 ## Install ##
 #############
+
+install(TARGETS terpcopter_px4flow_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
+)
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
