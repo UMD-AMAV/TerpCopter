@@ -26,7 +26,7 @@
 //
 ///////////////////////////////////////////
 
-#include <terpcopter_driver/terpcopter_camera.h>
+#include <terpcopter_driver/terpcopter_camera_node.h>
 #include <terpcopter_driver/terpcopter_camera_parameters.h>
 
 #include <ros/ros.h>
