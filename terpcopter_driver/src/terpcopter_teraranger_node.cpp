@@ -163,19 +163,19 @@ void TerarangerOne::setMode(char c)
   serial_port_->sendChar(c);
 }
 
-void TerarangerOne::dynParamCallback(const terarangerone::TerarangerOneConfig &config, uint32_t level)
+void TerarangerOne::dynParamCallback(const terpcopter_driver::TerarangerOneConfig &config, uint32_t level)
 {
-  if (config.Mode == terarangerone::TerarangerOne_Fast)
+  if (config.Mode == terpcopter_driver::TerarangerOne_Fast)
   {
     setMode(FAST_MODE);
   }
 
-  if (config.Mode == terarangerone::TerarangerOne_Precise)
+  if (config.Mode == terpcopter_driver::TerarangerOne_Precise)
   {
     setMode(PRECISE_MODE);
   }
  
-  if (config.Mode == terarangerone::TerarangerOne_Outdoor)
+  if (config.Mode == terpcopter_driver::TerarangerOne_Outdoor)
   {
     setMode(OUTDOOR_MODE);
   }
@@ -186,7 +186,7 @@ void TerarangerOne::dynParamCallback(const terarangerone::TerarangerOneConfig &c
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "terpcopter_teraranger_node");
-  terarangerone::TerarangerOne tera_bee;
+  terarangerone::TerarangerOne tera_ranger_one;
   ros::spin();
 
   return 0;

@@ -88,7 +88,7 @@ public:
   uint8_t crc8(uint8_t *p, uint8_t len);
   void serialDataCallback(uint8_t data);
 
-  void dynParamCallback(const terarangerone::TerarangerOneConfig &config, uint32_t level);
+  void dynParamCallback(const terpcopter_driver::TerarangerOneConfig &config, uint32_t level);
 
   bool loadParameters();
   void setMode(char c);
@@ -96,8 +96,8 @@ public:
   ros::NodeHandle nh_;
   ros::Publisher range_publisher_;
 
-  dynamic_reconfigure::Server<terarangerone::TerarangerOneConfig> dyn_param_server_;
-  dynamic_reconfigure::Server<terarangerone::TerarangerOneConfig>::CallbackType dyn_param_server_callback_function_;
+  dynamic_reconfigure::Server<terpcopter_driver::TerarangerOneConfig> dyn_param_server_;
+  dynamic_reconfigure::Server<terpcopter_driver::TerarangerOneConfig>::CallbackType dyn_param_server_callback_function_;
 
   SerialPort * serial_port_;
   boost::function<void(uint8_t)> serial_data_callback_function_;
