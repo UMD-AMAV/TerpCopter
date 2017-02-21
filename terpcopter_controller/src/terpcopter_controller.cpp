@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   // Define initial list of messages, actions, services
   controller.health.system = CONTROLLER_NODE;
   controller.health_pub =
-    controller.nh.advertise<terpcopter_common::Health>
+    controller.nh.advertise<terpcopter_comm::Health>
     ((std::string(CONTROLLER_NODE) + "_health").c_str(), 100);
 
   // Spin at 50Hz

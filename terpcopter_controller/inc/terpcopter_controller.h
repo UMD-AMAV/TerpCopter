@@ -1,6 +1,6 @@
 #pragma once
 
-#include <terpcopter_common/Health.h>
+#include <terpcopter_comm/Health.h>
 
 #include <ros/node_handle.h>
 #include <ros/ros.h>

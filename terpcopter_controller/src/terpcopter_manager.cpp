@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
   // Define initial list of messages, actions, services
   manager->health.system = MANAGER_NODE;
-  manager->health_pub = manager->nh.advertise<terpcopter_common::Health>
+  manager->health_pub = manager->nh.advertise<terpcopter_comm::Health>
     ((std::string(MANAGER_NODE) + "_health").c_str(), 100);
 
   // Spin at 50Hz

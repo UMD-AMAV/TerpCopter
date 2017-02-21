@@ -1,6 +1,6 @@
 #pragma once
 
-#include <terpcopter_common/Health.h>
+#include <terpcopter_comm/Health.h>
 
 #include <list>
 #include <map>

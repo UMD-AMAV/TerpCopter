@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
   // Define initial list of messages, actions, services
   localizer.health.system = LOCALIZER_NODE;
   localizer.health_pub =
-    localizer.nh.advertise<terpcopter_common::Health>
+    localizer.nh.advertise<terpcopter_comm::Health>
     ((std::string(LOCALIZER_NODE) + "_health").c_str(), 100);
 
   // Spin at 50Hz

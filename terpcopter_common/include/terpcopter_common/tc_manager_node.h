@@ -38,7 +38,7 @@ class TCManagerNode : public TCNode {
     int sys_idx;
 
     // Looks for system message/service to update systems list
-    void health_sub_cb(const terpcopter_common::Health::ConstPtr &msg);
+    void health_sub_cb(const terpcopter_comm::Health::ConstPtr &msg);
 
     // Start system with start_cmd
     int start_sys(const std::string &sys_name);

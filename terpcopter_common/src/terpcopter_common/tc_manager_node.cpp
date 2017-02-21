@@ -52,7 +52,7 @@ int TCManagerNode::check_systems() {
 
 // Looks for system message/service to update systems list
 void TCManagerNode::health_sub_cb(
-  const terpcopter_common::Health::ConstPtr &msg) {
+  const terpcopter_comm::Health::ConstPtr &msg) {
   // Determine healthy system or not
   if (ros::Time::now() - msg->t < msg_threshold) {
     switch(msg->health) {
