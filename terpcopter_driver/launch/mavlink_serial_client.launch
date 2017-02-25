@@ -1,0 +1,5 @@
+<launch>
+    <node name="mavlink" pkg="terpcopter_driver" type="mavlink_serial_client" output="screen" respawn="true" clear_params="true">
+        <rosparam file="$(find terpcopter_driver)/launch/mavlink_serial_client_parameters.yaml"/>
+    </node>
+</launch>

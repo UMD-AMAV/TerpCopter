@@ -20,8 +20,8 @@
 // CONDITIONS.
 //
 
-#ifndef TERPCOPTER_CAMERA_H_
-#define TERPCOPTER_CAMERA_H_
+#ifndef TERPCOPTER_CAMERA_NODE_H_
+#define TERPCOPTER_CAMERA_NODE_H_
 
 ///////////////////////////////////////////
 //
@@ -82,4 +82,4 @@ class CameraPublisher
 };
 
 
-#endif // TERPCOPTER_CAMERA_H_
+#endif // TERPCOPTER_CAMERA_NODE_H_
