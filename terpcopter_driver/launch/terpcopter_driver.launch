@@ -5,4 +5,7 @@
         <node name="terpcopter_px4flow_node" pkg="terpcopter_driver" type="terpcopter_px4flow_node" output="screen" respawn="true" clear_params="true">
         	<rosparam file="$(find terpcopter_driver)/launch/px4flow_parameters.yaml"/>
         </node>
+	<node name="terpcopter_teraranger_node" pkg="terpcopter_driver" type="terpcopter_teraranger_node" >
+		<param name="serial_port" type="str" value="/dev/ttyUSB1" />
+	</node>
 </launch>

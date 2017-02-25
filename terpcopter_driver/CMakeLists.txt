@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   cv_bridge
   terpcopter_comm
+  dynamic_reconfigure
 )
 
 find_package(Boost REQUIRED COMPONENTS thread system signals)
@@ -27,6 +28,10 @@ find_package(Eigen REQUIRED)
 # find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(OpenCV 3.1.0 REQUIRED)
+
+generate_dynamic_reconfigure_options(
+  cfg/TerarangerOne.cfg
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -116,7 +121,7 @@ find_package(OpenCV 3.1.0 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES terpcopter_driver
-  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs image_transport terpcopter_comm
+  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs image_transport terpcopter_comm dynamic_reconfigure
   DEPENDS system_lib boost eigen
 )
 
@@ -132,6 +137,7 @@ include_directories(
   ../terpcopter_libraries/mavlink/include/mavlink/v1.0
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${Eigen_INCLUDE_DIRS}
 )
 
@@ -146,11 +152,13 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(terpcopter_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+
 ## Declare a C++ executable
 # add_executable(terpcopter_driver_node src/terpcopter_driver_node.cpp)
 add_executable(terpcopter_camera_node src/terpcopter_camera_node.cpp)
 add_executable(mavlink_serial_client  src/mavlink_serial_comm.cpp src/mavlink_serial_client.cpp)
 add_executable(terpcopter_px4flow_node  src/px4flow_serial_comm.cpp  src/terpcopter_px4flow_node.cpp )
+add_executable(terpcopter_teraranger_node src/teraranger_serial_comm.cpp src/terpcopter_teraranger_node.cpp)
 
 
 ## Add cmake target dependencies of the executable
@@ -158,7 +166,7 @@ add_executable(terpcopter_px4flow_node  src/px4flow_serial_comm.cpp  src/terpcop
 # add_dependencies(terpcopter_driver_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(mavlink_serial_client terpcopter_comm_gencpp)
 add_dependencies(terpcopter_px4flow_node terpcopter_comm_gencpp)
-
+add_dependencies(terpcopter_teraranger_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 
 ## Specify libraries to link a library or executable target against
@@ -168,6 +176,8 @@ add_dependencies(terpcopter_px4flow_node terpcopter_comm_gencpp)
 target_link_libraries(terpcopter_camera_node  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 target_link_libraries(mavlink_serial_client   ${catkin_LIBRARIES} )
 target_link_libraries(terpcopter_px4flow_node   ${catkin_LIBRARIES} )
+target_link_libraries(terpcopter_teraranger_node   ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+
 
 
 #############
