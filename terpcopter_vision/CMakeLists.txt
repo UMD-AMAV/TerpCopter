@@ -8,10 +8,16 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  message_generation
+  terpcopter_comm
+  cv_bridge
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
+ find_package(OpenCV 3.1.0 REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -100,10 +106,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES terpcopter_vision
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
+  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs image_transport terpcopter_comm roslib
+  DEPENDS system_lib 
 )
 
 ###########
@@ -113,8 +119,10 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
+include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -127,17 +135,24 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(terpcopter_vision ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+
 ## Declare a C++ executable
 # add_executable(terpcopter_vision_node src/terpcopter_vision_node.cpp)
+add_executable(terpcopter_vision_server src/terpcopter_vision_server.cpp)
+add_executable(terpcopter_vision_client src/terpcopter_vision_client.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(terpcopter_vision_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(terpcopter_vision_server terpcopter_comm_gencpp)
+add_dependencies(terpcopter_vision_client terpcopter_comm_gencpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(terpcopter_vision_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(terpcopter_vision_server  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
+target_link_libraries(terpcopter_vision_client  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 
 #############
 ## Install ##
