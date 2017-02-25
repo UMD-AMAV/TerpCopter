@@ -8,7 +8,6 @@
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
  
-  <maintainer email="hengli@inf.ethz.ch">Lionel Heng</maintainer>
   <maintainer email="lkumar93@terpmail.umd.edu">Lakshman Kumar</maintainer>
   <url type="website">http://ros.org/wiki/px_comm</url>
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(terpcopter_comm)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs std_msgs message_generation sensor_msgs)
 
 add_message_files(
   DIRECTORY msg
@@ -10,13 +10,14 @@ add_message_files(
 
 add_service_files(
   DIRECTORY srv
-  FILES SetCameraInfo.srv
+  FILES SetCameraInfo.srv DetectBoundary.srv
 )
 
 generate_messages(
   DEPENDENCIES
   geometry_msgs
   std_msgs
+  sensor_msgs
 )
 
 # if RTI DDS is found
