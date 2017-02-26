@@ -1,5 +1,5 @@
 <launch>
-  <arg name="sim" default="false"/>
+  <arg name="sitl" default="false"/>
   <arg name="mav_name" default="firefly"/>
   <arg name="launch-prefix" default=" " />
 
@@ -7,9 +7,9 @@
       value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
 
   <!-- Start simulator manager -->
-  <group if="$(arg sim)">
-    <include file="$(find terpcopter_simulator)/launch/terpcopter_sitl_manager.launch"/>
-    <param name="terpcopter_sitl_manager_running" type="bool" value="1" />
+  <group if="$(arg sitl)">
+    <include file="$(find terpcopter_simulator)/launch/px4_sitl_manager.launch"/>
+    <param name="px4_sitl_manager_running" type="bool" value="1" />
   </group>
 
   <!-- Include offboard control driver -->

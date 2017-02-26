@@ -83,7 +83,7 @@ TerpCopterManager::TerpCopterManager(const char *nm) :
 // Start systems and subscribe to health of all nodes listed
 // Health messages will be named health_system_name
 int TerpCopterManager::initialize_systems(
-    const std::vector<std::string> &sys_list) {
+    std::vector<std::string> &sys_list) {
   ifstream sys_file(sys_list.front().c_str());
   string line, sys_pkg, sys_name, delim = " ";
   size_t pos = 0;
@@ -137,7 +137,6 @@ int TerpCopterManager::initialize_systems(
     }
 
     system_s::free_sys(sys);
-    sys_map.find(sys_name)->second.print();
   }
 
   return SUCCESS;

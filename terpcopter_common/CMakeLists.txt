@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(terpcopter_common)
 
 ## Find catkin macros and libraries
@@ -117,6 +117,10 @@ add_library(terpcopter_common
   src/${PROJECT_NAME}/system.cpp
   src/${PROJECT_NAME}/tc_node.cpp
   src/${PROJECT_NAME}/tc_manager_node.cpp
+)
+
+target_compile_options(terpcopter_common
+  PUBLIC -fPIC
 )
 
 ## Add cmake target dependencies of the library

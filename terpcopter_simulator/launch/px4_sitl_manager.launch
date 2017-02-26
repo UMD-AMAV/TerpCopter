@@ -10,6 +10,7 @@
 
   <node name="px4_sitl_manager" pkg="terpcopter_simulator"
       type="px4_sitl_manager" output="screen"/>
+  <param name="px4_sitl_manager_running" type="bool" value="1" />
 
   <include file="$(find mavros)/launch/px4.launch">
     <arg name="fcu_url" default="udp://:14540@localhost:14557"/>

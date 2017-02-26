@@ -16,7 +16,7 @@ class TCManagerNode : public TCNode {
     std::map<std::string, ros::Subscriber> curr_sys_map;
     std::map<std::string, system_s> sys_map;
 
-    virtual int initialize_systems(const std::vector<std::string> &sys_list) = 0;
+    virtual int initialize_systems(std::vector<std::string> &sys_list) = 0;
 
     int teardown_systems();
     
@@ -30,9 +30,12 @@ class TCManagerNode : public TCNode {
     // Remove generic system from sys_map
     int remove_system(const std::string &sys_name);
 
-    //Constructor
+    // Constructor
     TCManagerNode(std::string &nm);
     TCManagerNode(const char *nm);
+
+    // Destructor
+    ~TCManagerNode();
 
   private:
     int sys_idx;

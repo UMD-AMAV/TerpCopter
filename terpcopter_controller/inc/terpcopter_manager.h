@@ -18,7 +18,7 @@ class TerpCopterManager : public TCManagerNode {
 
   public:
     virtual int initialize_systems(
-        const std::vector<std::string> &sys_list);
+      std::vector<std::string> &sys_list);
     
     //Constructor
     TerpCopterManager(std::string &nm);
