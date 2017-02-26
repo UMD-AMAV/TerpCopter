@@ -1,7 +1,12 @@
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <terpcopter_common/system.h>
 
 using namespace std;
@@ -10,7 +15,12 @@ using namespace std;
 // Messages seem to take ~.01-.05s to transfer on this system
 const ros::Duration msg_threshold(.11);
 
+// -----------------------------------------
+
+// General system functions ----------------
 int wrd_list_to_string(std::string &s, char **wrds) {
+  // Empty destination string
+  s.assign("");
   std::string tmp;
   int wrd_len=0;
   int i=0;
@@ -65,9 +75,47 @@ bool operator==(const system_s &lhs, const system_s &rhs) {
     return false;
 }
 
+// Handle SIGCHLD
+// Useful for tc_manager_node
+void child_handler(int sig) {
+  pid_t pid;
+  union wait wstat;
+  int status;
+
+  //FIXME make this more portable
+  // Give roskill chance to exit thru system call cleanup before waiting.
+  // Does this make sense?
+  // It seems to work...
+  sleep(1);   
+
+  while(1) {
+    pid = wait3(&status, WNOHANG, (struct rusage *)NULL);
+    if (!pid)
+      return;
+    else if (pid == -1)
+      return;
+    else {
+      if (WIFEXITED(status)) {
+        ROS_INFO("pid %d: child exited with status code %d\n",
+            pid, WEXITSTATUS(status));
+      } else if (WIFSIGNALED(status)) {
+        ROS_INFO("pid %d: child killed by signal %d\n",
+          pid, WTERMSIG(status));
+      }
+    }
+  }
+
+  fflush(stdout);fflush(stderr);
+}
+
+// -----------------------------------------
+
+// struct system_s functions ---------------
+
 // Constructors
 system_s::system_s() {
-
+  start_cmd=NULL;
+  end_cmd=NULL;
 }
 
 system_s::system_s(std::string nm, std::string pack,
@@ -78,7 +126,7 @@ system_s::system_s(std::string nm, std::string pack,
   alloc_cmds(st_cmd,nd_cmd);
 }
 
-// Copy constructor
+// Deep copy constructor
 system_s::system_s(const system_s &sys) {
   name.assign(sys.name);
   pkg.assign(sys.pkg);
@@ -86,21 +134,36 @@ system_s::system_s(const system_s &sys) {
   alloc_cmds(sys.start_cmd,sys.end_cmd);
 }
 
+// system_s deep copy assignment
+void system_s::assign(std::string nm, std::string pack,
+      char **st_cmd, char **nd_cmd, bool is_ros){
+  free_sys(*this);
+  name.assign(nm);
+  pkg.assign(pack);
+  ros=is_ros;
+  alloc_cmds(st_cmd,nd_cmd);
+}
+
 // Free members that have memory allocated to them 
 void system_s::free_sys(system_s &sys) {
+  free_cmds(sys.start_cmd,sys.end_cmd);
+}
+
+void system_s::free_cmds(
+    char **st_cmd, char **nd_cmd) {
   int i=0;
-  while (sys.start_cmd[i]) {
-    free(sys.start_cmd[i++]);
+  while (st_cmd && st_cmd[i]) {
+    free(st_cmd[i++]);
   }
 
-  free(sys.start_cmd);
+  free(st_cmd);
 
   i=0;
-  while (sys.end_cmd[i]) {
-    free(sys.end_cmd[i++]);
+  while (nd_cmd && nd_cmd[i]) {
+    free(nd_cmd[i++]);
   }
 
-  free(sys.end_cmd);
+  free(nd_cmd);
 }
 
 void system_s::print() const {
@@ -122,7 +185,8 @@ bool system_s::equals(const system_s &cmp) {
 }
 
 
-void system_s::alloc_cmds(char **st_cmd, char **nd_cmd) {
+//void system_s::alloc_cmds(const char **st_cmd, const char **nd_cmd) {
+void system_s::alloc_cmds(char *const *st_cmd, char *const *nd_cmd) {
   int num_wrds=0;
   while(st_cmd[num_wrds++]);
   start_cmd = (char **) malloc(num_wrds*sizeof(st_cmd) + 1);
@@ -147,3 +211,5 @@ void system_s::alloc_cmds(char **st_cmd, char **nd_cmd) {
   }
   end_cmd[i]=NULL;
 }
+
+// -----------------------------------------

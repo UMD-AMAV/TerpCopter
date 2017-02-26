@@ -1,0 +1,44 @@
+terpcopter_autopilot:
+
+
+terpcopter_comm:
+  MAVROS
+
+terpcopter_common:
+  px4
+
+terpcopter_controller:
+
+
+terpcopter_demo:
+
+
+terpcopter_description:
+
+
+terpcopter_driver:
+
+
+terpcopter_gazebo:
+
+
+terpcopter_sensor_processor:
+
+
+terpcopter_simulator:
+  gazebo
+  px4/Firmware
+  MAVROS
+
+terpcopter_teleop:
+
+
+terpcopter_vision:
+
+
+tools:
+  pkill
+  gazebo
+  px4/Firmware
+  xterm
+

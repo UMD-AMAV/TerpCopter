@@ -1,6 +1,6 @@
 #pragma once
 
-#include <terpcopter_common/Health.h>
+#include <terpcopter_comm/Health.h>
 
 #include <ros/node_handle.h>
 #include <ros/ros.h>
@@ -12,7 +12,7 @@ class TCNode {
 
     ros::NodeHandle nh;
 
-    terpcopter_common::Health health;
+    terpcopter_comm::Health health;
 
     ros::Publisher health_pub;
 

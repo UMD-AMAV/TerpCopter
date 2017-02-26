@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(terpcopter_common)
 
 ## Find catkin macros and libraries
@@ -43,10 +43,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Health.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -63,10 +63,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -117,6 +117,10 @@ add_library(terpcopter_common
   src/${PROJECT_NAME}/system.cpp
   src/${PROJECT_NAME}/tc_node.cpp
   src/${PROJECT_NAME}/tc_manager_node.cpp
+)
+
+target_compile_options(terpcopter_common
+  PUBLIC -fPIC
 )
 
 ## Add cmake target dependencies of the library

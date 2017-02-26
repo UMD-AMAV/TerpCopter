@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <ros/package.h>
+#include <signal.h>
 #include <string>
 #include <terpcopter_common/tc_manager_node.h>
 
@@ -9,11 +10,28 @@
 TCManagerNode::TCManagerNode(std::string &nm) :
   TCNode(nm), sys_idx(0)
 {
+   // Set SIGCHLD handler
+  struct sigaction sa;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = child_handler;
+  sigaction(SIGCHLD, &sa, NULL);
 }
 
 TCManagerNode::TCManagerNode(const char *nm) :
   TCNode(nm), sys_idx(0)
 {
+ // Set SIGCHLD handler
+  struct sigaction sa;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = child_handler;
+  sigaction(SIGCHLD, &sa, NULL);
+}
+
+TCManagerNode::~TCManagerNode() {
+  // Reset SIGCHLD signal handler
+  //signal(SIGCHLD, SIG_IGN); // Silently (and portably) reap children
 }
 
 int TCManagerNode::teardown_systems() {
@@ -52,7 +70,7 @@ int TCManagerNode::check_systems() {
 
 // Looks for system message/service to update systems list
 void TCManagerNode::health_sub_cb(
-  const terpcopter_common::Health::ConstPtr &msg) {
+  const terpcopter_comm::Health::ConstPtr &msg) {
   // Determine healthy system or not
   if (ros::Time::now() - msg->t < msg_threshold) {
     switch(msg->health) {
@@ -72,13 +90,14 @@ void TCManagerNode::health_sub_cb(
       case RESTART_SYS:
         ROS_INFO("%s restarting system %s",
             name.c_str(),msg->system.c_str());
-        if (msg->system.compare(name) &&
-            !remove_system(msg->system)) {
-          if (sys_map.find(msg->system) != sys_map.end()) {
-            add_system(sys_map.find(msg->system)->second);
-          } else {
-            ROS_ERROR("Can't find %s in %s system map",
-                msg->system.c_str(), name.c_str());
+        if (msg->system.compare(name)) {
+          if (!remove_system(msg->system)) {
+            if (sys_map.find(msg->system) != sys_map.end()) {
+              add_system(sys_map.find(msg->system)->second);
+            } else {
+              ROS_ERROR("Can't find %s in %s system map",
+                  msg->system.c_str(), name.c_str());
+            }
           }
         } else { // Managing system
           ROS_INFO("Restarting current managing system %s",
@@ -124,7 +143,9 @@ int TCManagerNode::add_system(const system_s &sys) {
 
       if (!b) { // Restarting system 
         sys_ret = start_sys(sys.name);
+        // Give ROS node time to set _running parameter
         sleep(1);
+        // Check that system started correctly
         nh.getParam("/"+sys.name+"_running", b);
         if (!sys_ret && b) {
           ROS_DEBUG("Successfully restarted system %s",
@@ -228,7 +249,7 @@ int TCManagerNode::start_sys(const std::string &sys_name) {
 
     pid = fork();
     if (pid == 0) {
-      ROS_INFO("Child process pid %u\nSystem %s %s",
+      ROS_DEBUG("Child process pid %u\nSystem %s %s",
           getpid(),
           sys->pkg.c_str(),
           sys->name.c_str());
@@ -243,7 +264,7 @@ int TCManagerNode::start_sys(const std::string &sys_name) {
       ROS_ERROR("Could not start system %s %s",
         sys->pkg.c_str(), sys->name.c_str());
 
-      exit(EXIT_FAILURE);
+      return ERROR;
 
     } else if (pid > 0) {
       ROS_DEBUG("Started child process pid %u\n\
@@ -257,7 +278,8 @@ for system %s %s",
   
     return SUCCESS;
   } else {
-    ROS_ERROR("Can't find system %s in sys_map",sys_name.c_str());
+    ROS_ERROR("Can't find system %s in %s sys_map to start system.",
+        sys_name.c_str(), name.c_str());
     return ERROR;
   }
 }
@@ -274,12 +296,12 @@ int TCManagerNode::end_sys(const std::string &sys_name) {
 
     sys_ret = system(s.c_str());
     if (sys_ret < 0) {
-      ROS_ERROR("Unable to end system %s",
+      ROS_ERROR("Unable to properly end system %s",
         sys_name.c_str());
       return ERROR;
     }
   } else {
-    ROS_INFO("Can't find system %s in %s system map",
+    ROS_INFO("Can't find system %s in %s system map to end system",
         sys_name.c_str(), name.c_str());
     return ERROR;
   }
