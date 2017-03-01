@@ -15,9 +15,14 @@ class TerpCopterController : public TCNode {
   public:
     // Messages
     mavros_msgs::State current_mavros_state;
+    geometry_msgs::PoseStamped local_pose;
+
+    //Publishers
+    ros::Publisher local_pos_pub;
 
     // Callbacks
     void mavros_state_cb(const mavros_msgs::State::ConstPtr& msg);
+    void local_pos_pub_cb(const ros::TimerEvent&);
 
     // Constructors
     TerpCopterController(std::string &nm);

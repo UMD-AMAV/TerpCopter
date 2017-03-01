@@ -96,7 +96,7 @@ void child_handler(int sig) {
       return;
     else {
       if (WIFEXITED(status)) {
-        ROS_INFO("pid %d: child exited with status code %d\n",
+        ROS_DEBUG("pid %d: child exited with status code %d\n",
             pid, WEXITSTATUS(status));
       } else if (WIFSIGNALED(status)) {
         ROS_INFO("pid %d: child killed by signal %d\n",
