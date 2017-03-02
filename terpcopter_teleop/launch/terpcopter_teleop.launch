@@ -1,0 +1,4 @@
+<launch>
+	<node name="terpcopter_keyboard_teleop_node" pkg="terpcopter_teleop" type="terpcopter_keyboard_teleop_node" >
+	</node>
+</launch>
