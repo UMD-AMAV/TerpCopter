@@ -1,0 +1,4 @@
+<launch>
+	<node name="terpcopter_localization_node" pkg="terpcopter_sensor_processor" type="terpcopter_localization_node" >
+	</node>
+</launch>
