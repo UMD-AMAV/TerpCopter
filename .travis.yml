@@ -39,6 +39,9 @@ env:
     - ROSINSTALL_FILE=$CI_SOURCE_PATH/dependencies.rosinstall
     - CATKIN_OPTIONS=$CI_SOURCE_PATH/catkin.options
     - ROS_PARALLEL_JOBS='-j8 -l6'
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    # via the "travis encrypt" command using the project repo's public key
+    - secure: "F0qnjx3az08XT+kxFdNqMFTxqmohc0tyxTCNMcufrG6+70mlwYnpE5eM/4nUNWzyKpAxfKzTc3gBtunbN2X/7okfy55cXA9SaA3LDXdxoluLxDmS6AfEMa3+yF4jvneAtIR4UCvPcZNDCBJXJmWQ/JYtxHVFp2wweKNzPEodVTPZm0uCkB+hvaU5d1Ono6QTNFmk+YhvaMeCt0TbULJBjOxAYYv8as5x/lI1bMwy54Jm8n/p/kiz5WSUXG3aRZXUW27IT76/kW+KpK1xyAEs/Hh0Kt1prYGYOwD8reuxng63yDG//SA27byPWrMUdZ2Hl2AZw3OcT+FvEOifK7axrIvTLtBphKY1b+mLIUYH8d3r5PvqmqtG5Bayjeqh3126xp5rpXPZzZ9qFbHkOO91ptirpPH7hNzH0tdlIDf1oRGvfyD/7eFPsOJgk8h7wmnHQGJ16NGA+JNrODpl3TLNKFzZ1ESndq32Aqt1fjg8xLpV5udZ/LTgoWNu+WepF1li3Uditzj0NZnGDCH2jEonNPo2hClV/acY6rx32E1YZSS6y0jl5SZqmQyb7ZE8eWVa42iwyivDYx0oXoD378Cxa8dgR1vK8f4r6f+3U7sclDtNM8Mg4xFrtIhd2MRuF1JJk/fBjLG4Zm1rpEKhjez8J/TNAQrMxp+ZE2pif0YInqo="
 
 ################################################################################
 
@@ -53,6 +56,8 @@ before_install:
   # Prepare rosdep to install dependencies.
   - sudo rosdep init
   - rosdep update
+  
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 # Create a catkin workspace with the package under integration.
 install:
@@ -80,6 +85,18 @@ before_script:
   - cd ~/catkin_ws
   - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 
+
+# Do static code analysis with coverity
+addons:
+  coverity_scan:
+    project:
+      name: "UMD-AMAV/TerpCopter"
+      description: "UMD's Autopilot Software for AMAV Competition"
+    notification_email: lkumar93@umd.edu
+    build_command_prepend: "cd ~/catkin_ws && rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO"
+    build_command:   "catkin_make"
+    branch_pattern: master
+
 # Compile and test (mark the build as failed if any step fails). If the
 # CATKIN_OPTIONS file exists, use it as an argument to catkin_make, for example
 # to blacklist certain packages.
@@ -95,10 +112,6 @@ script:
   # Run the tests, ensuring the path is set correctly.
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
-
-# Do static code analysis with codecov after build succeeds
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
 
 # Send notifications to terpcopter-software channel in AMAV2017 slack group
 notifications:
