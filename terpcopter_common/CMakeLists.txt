@@ -4,6 +4,11 @@ project(terpcopter_common)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+find_package(catkin REQUIRED
+  cmake_modules
+)
+
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
@@ -101,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES terpcopter_common
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime terpcopter_comm
 #  DEPENDS system_lib
 )
 
@@ -111,7 +116,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories(
+  include
+	${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a C++ library
 add_library(terpcopter_common
