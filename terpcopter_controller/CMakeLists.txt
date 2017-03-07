@@ -8,6 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  terpcopter_common
+  terpcopter_comm
+  mavros
+  mavros_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,13 +54,6 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
@@ -68,6 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
 # generate_messages(
 #   DEPENDENCIES
 #   std_msgs
+#   terpcopter_common
 # )
 
 ################################################
@@ -100,9 +98,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES terpcopter_controller
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  INCLUDE_DIRS inc
+#  LIBRARIES terpcopter_manager terpcopter_controller
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime terpcopter_comm
 #  DEPENDS system_lib
 )
 
@@ -115,29 +113,38 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  inc
 )
 
-## Declare a C++ library
-# add_library(terpcopter_controller
-#   src/${PROJECT_NAME}/terpcopter_controller.cpp
-# )
+## Declare a C++ executable
+add_executable(terpcopter_manager
+ src/terpcopter_manager.cpp
+)
 
 ## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-# add_executable(terpcopter_controller_node src/terpcopter_controller_node.cpp)
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(terpcopter_controller_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(terpcopter_manager
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(terpcopter_controller_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(terpcopter_manager
+  ${catkin_LIBRARIES}
+)
+
+## Declare a C++ executable
+add_executable(terpcopter_controller
+ src/terpcopter_controller.cpp
+)
+
+## Add cmake target dependencies of the library
+add_dependencies(terpcopter_controller
+ ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+)
+
+## Specify libraries to link a library or executable target against
+target_link_libraries(terpcopter_controller
+ ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

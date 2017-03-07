@@ -3,9 +3,24 @@ project(terpcopter_comm)
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs std_msgs message_generation sensor_msgs)
 
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS
+  message_generation
+  roscpp
+  rospy
+  std_msgs
+)
+
+## Generate messages in the 'msg' folder
 add_message_files(
   DIRECTORY msg
-  FILES CameraInfo.msg Mavlink.msg OpticalFlow.msg
+  FILES
+  Health.msg
+  CameraInfo.msg
+  Mavlink.msg
+  OpticalFlow.msg
 )
 
 add_service_files(
@@ -18,7 +33,9 @@ generate_messages(
   geometry_msgs
   std_msgs
   sensor_msgs
+  ${MSG_DEP_SET}
 )
+
 
 # if RTI DDS is found
 if(DEFINED ENV{NDDSHOME})
@@ -47,6 +64,6 @@ if(DEFINED ENV{NDDSHOME})
 else()
   catkin_package(
     INCLUDE_DIRS include
-    CATKIN_DEPENDS message_runtime
+    CATKIN_DEPENDS message_runtime std_msgs ${MSG_DEP_SET}
   )
 endif()

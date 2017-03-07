@@ -1,0 +1,29 @@
+<launch>
+  <arg name="mav_name" default="firefly"/>
+  <arg name="world_name" default="basic"/>
+  <arg name="enable_logging" default="false"/>
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="log_file" default="$(arg mav_name)"/>
+
+  <!-- FIXME how to manage simulator if can only be started with 
+       make command?
+       simulator_manager node (how to manage that?)? -->
+
+  <!-- Launched correctly with:
+       $ make posix_sitl_default gazebo
+       $ roslaunch mavros px4.launch fcu_url:=udp://:14540@14557
+       $ roslaunch terpcopter_simulator terpcopter_basic_ctl.launch
+   -->
+
+  <group>
+    <!-- Not working rn
+    <include file="$(find px4)/launch/posix_sitl.launch"/>
+    -->
+    <node name="px4" pkg="terpcopter_simulator" type="run_px4_sitl.sh"/>
+    <include file="$(find mavros)/launch/px4.launch">
+			<arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+    </include>
+  </group>
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->

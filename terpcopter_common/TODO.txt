@@ -1,0 +1,5 @@
+Fix how systems are cached, changed, and removed from sys_map
+  Remember to free system_s memory!
+
+Fix how manager_node handles CTRL-C
+  Seems to continue execution normally until signal escalates to SIGTERM
