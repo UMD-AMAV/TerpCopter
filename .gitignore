@@ -34,6 +34,7 @@
 # Vim Swap Files
 *.swp
 *.swo
+*.sw*
 
 # Catkin & CMake Cache Folders
 build/

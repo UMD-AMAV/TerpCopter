@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   terpcopter_common
+  terpcopter_comm
   mavros
   mavros_msgs
 )
@@ -122,12 +123,12 @@ add_executable(terpcopter_manager
 
 ## Add cmake target dependencies of the library
 add_dependencies(terpcopter_manager
- ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
 )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(terpcopter_manager
- ${catkin_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 ## Declare a C++ executable

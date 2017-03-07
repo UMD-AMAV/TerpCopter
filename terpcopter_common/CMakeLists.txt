@@ -7,6 +7,7 @@ project(terpcopter_common)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
+  terpcopter_comm
 )
 
 ## System dependencies are found with CMake's conventions
@@ -126,7 +127,9 @@ target_compile_options(terpcopter_common
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_common ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(terpcopter_common
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+)
 
 ## Declare a C++ executable
 # add_executable(terpcopter_common_node src/terpcopter_common_node.cpp)

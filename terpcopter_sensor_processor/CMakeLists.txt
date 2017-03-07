@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   terpcopter_common
+  terpcopter_comm
 )
 
 ## System dependencies are found with CMake's conventions

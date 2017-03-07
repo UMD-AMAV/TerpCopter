@@ -46,6 +46,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
 add_message_files(
+  DIRECTORY msg
   FILES
   Health.msg
 )
@@ -68,7 +69,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
-  terpcopter_comm
+  ${MSG_DEP_SET}
 )
 
 ################################################
@@ -101,9 +102,8 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
 #  LIBRARIES terpcopter_comm
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+CATKIN_DEPENDS message_runtime std_msgs ${MSG_DEP_SET}
 #  DEPENDS system_lib
 )
 
@@ -126,7 +126,9 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_comm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(terpcopter_comm
+#   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+#)
 
 ## Declare a C++ executable
 # add_executable(terpcopter_comm_node src/terpcopter_comm_node.cpp)
