@@ -4,9 +4,11 @@ project(terpcopter_common)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
+  terpcopter_comm
 )
 
 ## System dependencies are found with CMake's conventions
@@ -100,7 +102,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES terpcopter_common
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime terpcopter_comm
 #  DEPENDS system_lib
 )
 
@@ -110,7 +112,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories(
+  include
+	${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a C++ library
 add_library(terpcopter_common
@@ -126,7 +131,9 @@ target_compile_options(terpcopter_common
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_common ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(terpcopter_common
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+)
 
 ## Declare a C++ executable
 # add_executable(terpcopter_common_node src/terpcopter_common_node.cpp)

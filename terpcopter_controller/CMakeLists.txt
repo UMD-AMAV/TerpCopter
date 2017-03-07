@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   terpcopter_common
+  terpcopter_comm
   mavros
   mavros_msgs
 )
@@ -97,9 +98,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES terpcopter_controller
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+#  INCLUDE_DIRS inc
+#  LIBRARIES terpcopter_manager terpcopter_controller
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime terpcopter_comm
 #  DEPENDS system_lib
 )
 
@@ -122,12 +123,12 @@ add_executable(terpcopter_manager
 
 ## Add cmake target dependencies of the library
 add_dependencies(terpcopter_manager
- ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
 )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(terpcopter_manager
- ${catkin_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 ## Declare a C++ executable
