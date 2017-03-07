@@ -50,6 +50,7 @@
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>terpcopter_common</run_depend>
+  <run_depend>terpcopter_comm</run_depend>
   <run_depend>std_msgs</run_depend>
 
 
