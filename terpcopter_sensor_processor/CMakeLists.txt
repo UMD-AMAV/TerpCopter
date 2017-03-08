@@ -62,7 +62,6 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   include
-  inc
 )
 
 ## Declare a C++ executable

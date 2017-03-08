@@ -9,7 +9,7 @@
 #include <ros/package.h>
 #include <string>
 #include <cstring>
-#include <px4_sitl_manager.h> 
+#include <terpcopter_simulator/px4_sitl_manager.h> 
 using namespace std;
 
 PX4SITLManager *manager=NULL;

@@ -7,7 +7,7 @@
 #include <string>
 #include <stdio.h>
 #include <terpcopter_common/system.h>
-#include <terpcopter_localizer.h>
+#include <terpcopter_sensor_processor/terpcopter_localizer.h>
 
 using namespace std;
 
