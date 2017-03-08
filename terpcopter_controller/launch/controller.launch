@@ -1,0 +1,23 @@
+<launch>
+  <arg name="sitl" default="false"/>
+  <arg name="mav_name" default="firefly"/>
+  <arg name="launch-prefix" default=" " />
+
+  <env name="ROSCONSOLE_CONFIG_FILE"
+      value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
+
+  <!-- Start simulator manager -->
+  <group if="$(arg sitl)">
+    <include file="$(find terpcopter_simulator)/launch/px4_sitl_manager.launch"/>
+    <param name="px4_sitl_manager_running" type="bool" value="1" />
+  </group>
+
+  <!-- Include offboard control driver -->
+  <node name="terpcopter_manager" pkg="terpcopter_controller"
+      type="terpcopter_manager" output="screen"
+      launch-prefix="$(arg launch-prefix)" />
+  <param name="terpcopter_manager_running" type="bool" value="1" />
+
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->

@@ -1,0 +1,21 @@
+<launch>
+  <arg name="mav_name" default="firefly"/>
+  <arg name="world_name" default="basic"/>
+  <arg name="enable_logging" default="false"/>
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="log_file" default="$(arg mav_name)"/>
+
+  <env name="ROSCONSOLE_CONFIG_FILE"
+      value="$(find terpcopter_description)/config/custom_rosconsole.conf"/>
+
+  <node name="px4_sitl_manager" pkg="terpcopter_simulator"
+      type="px4_sitl_manager" output="screen"/>
+  <param name="px4_sitl_manager_running" type="bool" value="1" />
+
+  <include file="$(find mavros)/launch/px4.launch">
+    <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+  </include>
+
+</launch>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->

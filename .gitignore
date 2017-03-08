@@ -32,7 +32,10 @@
 *~
 
 # Vim Swap Files
-.*.*.sw*
+*.swp
+*.swo
+*.sw*
+>>>>>>> feature/simulator_start
 
 # Catkin & CMake Cache Folders
 build/

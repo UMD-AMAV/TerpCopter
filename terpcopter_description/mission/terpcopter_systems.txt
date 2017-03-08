@@ -1,0 +1,14 @@
+# FIXME right now all system names must be unique
+# Should be able to fix by renaming nodes with package and node names
+
+# put mission systems here in plain text
+# ros_package rosnode_name
+
+# Manages systems in program
+terpcopter_controller terpcopter_manager
+
+# Controls drone
+terpcopter_controller terpcopter_controller
+
+# Drone localization
+terpcopter_sensor_processor terpcopter_localizer

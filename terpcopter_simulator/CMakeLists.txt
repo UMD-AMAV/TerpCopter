@@ -8,11 +8,18 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  terpcopter_common
+  terpcopter_comm
+  mavros
+  mavros_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+
+# Check launch files
+#roslaunch_add_file_check(launch)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -100,9 +107,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS inc
 #  LIBRARIES terpcopter_simulator
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime terpcopter_comm
 #  DEPENDS system_lib
 )
 
@@ -115,29 +122,23 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  inc
 )
 
-## Declare a C++ library
-# add_library(terpcopter_simulator
-#   src/${PROJECT_NAME}/terpcopter_simulator.cpp
-# )
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(terpcopter_simulator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 ## Declare a C++ executable
-# add_executable(terpcopter_simulator_node src/terpcopter_simulator_node.cpp)
+add_executable(px4_sitl_manager
+   src/px4_sitl_manager.cpp
+)
 
 ## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(terpcopter_simulator_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(px4_sitl_manager
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(terpcopter_simulator_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(px4_sitl_manager
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
