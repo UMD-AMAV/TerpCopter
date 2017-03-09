@@ -15,7 +15,7 @@
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
 
-	<include file="$(find terpcopter_driver)/launch/node.launch">
+	<include file="$(find terpcopter_driver)/launch/pixhawk.launch">
 		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
 		<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
 
