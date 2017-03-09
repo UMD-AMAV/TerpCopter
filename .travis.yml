@@ -94,7 +94,7 @@ addons:
       description: "UMD's Autopilot Software for AMAV Competition"
     notification_email: lkumar93@umd.edu
     build_command_prepend: "cd ~/catkin_ws && rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO"
-    build_command:   "catkin_make"
+    build_command:   "catkin_make && cp -r build src/TerpCopter && cd src/TerpCopter"
     branch_pattern: master
 
 # Compile and test (mark the build as failed if any step fails). If the

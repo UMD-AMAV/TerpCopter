@@ -1,13 +1,6 @@
 <launch>
-	<node name="terpcopter_camera_node" pkg="terpcopter_driver" type="terpcopter_camera_node" >
-		<param name="forward_camera_id" type="int" value="0" />
-	</node>
-        <node name="terpcopter_px4flow_node" pkg="terpcopter_driver" type="terpcopter_px4flow_node" output="screen" respawn="true" clear_params="true">
-        	<rosparam file="$(find terpcopter_driver)/launch/px4flow_parameters.yaml"/>
-        </node>
-	<node name="terpcopter_teraranger_node" pkg="terpcopter_driver" type="terpcopter_teraranger_node" >
-		<param name="serial_port" type="str" value="/dev/ttyUSB1" />
-	</node>
+	<!-- vim: set ft=xml noet : -->
+	<!-- example launch script for PX4 based FCU's -->
 
 	<arg name="fcu_url" default="/dev/ttyACM2:57600" />
 	<arg name="gcs_url" default="" />
@@ -25,5 +18,4 @@
 		<arg name="tgt_component" value="$(arg tgt_component)" />
 		<arg name="log_output" value="$(arg log_output)" />
 	</include>
-
 </launch>
