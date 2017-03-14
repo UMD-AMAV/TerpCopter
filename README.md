@@ -3,7 +3,7 @@ University of Maryland's Autopilot Software for Autonomous-Micro Aerial Vehicles
 
 ## Reference Guides
 
-Have a look at [*C++ Cheat Sheet*](www.pa.msu.edu/~duxbury/courses/phy480/Cpp_refcard.pdf) , [*ROS Cheat Sheet*](https://mirror.umd.edu/roswiki/attachments/de/ROScheatsheet.pdf) and [*Git Cheat Sheet*](https://services.github.com/kit/downloads/github-git-cheat-sheet.pdf) for quick reference
+Have a look at [*C++ Cheat Sheet*](https://www.pa.msu.edu/~duxbury/courses/phy480/Cpp_refcard.pdf) , [*ROS Cheat Sheet*](https://mirror.umd.edu/roswiki/attachments/de/ROScheatsheet.pdf) and [*Git Cheat Sheet*](https://services.github.com/kit/downloads/github-git-cheat-sheet.pdf) for quick reference
 
 ## Contribution Rules
 
