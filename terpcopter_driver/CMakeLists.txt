@@ -159,6 +159,9 @@ add_executable(terpcopter_camera_node src/terpcopter_camera_node.cpp)
 add_executable(mavlink_serial_client  src/mavlink_serial_comm.cpp src/mavlink_serial_client.cpp)
 add_executable(terpcopter_px4flow_node  src/px4flow_serial_comm.cpp  src/terpcopter_px4flow_node.cpp )
 add_executable(terpcopter_teraranger_node src/teraranger_serial_comm.cpp src/terpcopter_teraranger_node.cpp)
+add_executable(terpcopter_servo_server src/terpcopter_servo_server.cpp)
+add_executable(terpcopter_servo_client src/terpcopter_servo_client.cpp)
+
 
 
 ## Add cmake target dependencies of the executable
@@ -167,6 +170,8 @@ add_executable(terpcopter_teraranger_node src/teraranger_serial_comm.cpp src/ter
 add_dependencies(mavlink_serial_client terpcopter_comm_gencpp)
 add_dependencies(terpcopter_px4flow_node terpcopter_comm_gencpp)
 add_dependencies(terpcopter_teraranger_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(terpcopter_servo_server terpcopter_comm_gencpp)
+add_dependencies(terpcopter_servo_client terpcopter_comm_gencpp)
 
 
 ## Specify libraries to link a library or executable target against
@@ -177,6 +182,9 @@ target_link_libraries(terpcopter_camera_node  ${catkin_LIBRARIES} ${OpenCV_LIBRA
 target_link_libraries(mavlink_serial_client   ${catkin_LIBRARIES} )
 target_link_libraries(terpcopter_px4flow_node   ${catkin_LIBRARIES} )
 target_link_libraries(terpcopter_teraranger_node   ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(terpcopter_servo_server   ${catkin_LIBRARIES} )
+target_link_libraries(terpcopter_servo_client   ${catkin_LIBRARIES} )
+
 
 
 
