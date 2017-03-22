@@ -36,7 +36,7 @@
 
 void servo_sweep_thread()
 {
-	ros::Rate loop_rate(10);
+
 
 	current_position = (min_position+max_position)/2;
 	int offset = step_size;
@@ -50,6 +50,8 @@ void servo_sweep_thread()
 		cmd_msg.max_range = max_position;
 		cmd_msg.field_of_view = max_position - min_position;
 		cmd_msg.radiation_type = 1 ;
+
+		ros::Rate loop_rate(2*cmd_msg.field_of_view);
 
 		if(sweep_flag)
 		{			

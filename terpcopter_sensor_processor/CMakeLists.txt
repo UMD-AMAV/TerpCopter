@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   terpcopter_common
   terpcopter_comm
+  message_filters
 )
 
 
@@ -67,29 +68,24 @@ include_directories(
 ## Declare a C++ executable
 # add_executable(terpcopter_sensor_processor_node src/terpcopter_sensor_processor_node.cpp)
 add_executable(terpcopter_localization_node src/terpcopter_localization_node.cpp)
+add_executable(terpcopter_obstacle_detection_node src/terpcopter_obstacle_detection_node.cpp)
+add_executable(terpcopter_localizer src/terpcopter_localizer.cpp )
+
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(terpcopter_sensor_processor_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(terpcopter_localization_node terpcopter_comm_gencpp)
+add_dependencies(terpcopter_obstacle_detection_node terpcopter_comm_gencpp)
+add_dependencies(terpcopter_localizer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(terpcopter_sensor_processor_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(terpcopter_localization_node   ${catkin_LIBRARIES} )
-
-add_executable(terpcopter_localizer
- src/terpcopter_localizer.cpp
-)
-
-## Add cmake target dependencies of the library
-add_dependencies(terpcopter_localizer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Specify libraries to link a library or executable target against
-target_link_libraries(terpcopter_localizer
- ${catkin_LIBRARIES}
-)
+target_link_libraries(terpcopter_obstacle_detection_node   ${catkin_LIBRARIES} )
+target_link_libraries(terpcopter_localizer  ${catkin_LIBRARIES} )
 
 #############
 ## Install ##
