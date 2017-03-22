@@ -21,6 +21,7 @@ add_message_files(
   CameraInfo.msg
   Mavlink.msg
   OpticalFlow.msg
+  ObstacleDetection.msg
 )
 
 add_service_files(
