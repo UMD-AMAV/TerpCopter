@@ -37,7 +37,7 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include "terpcopter_comm/DetectBoundary.h"
+#include "terpcopter_comm/DetectObject.h"
 
 ///////////////////////////////////////////
 //
@@ -93,15 +93,14 @@ struct ContourDataT
     int center_y;
     float area;
     float arc_length;
+    float width;
+    float height;
     int number_of_contours;
+    int number_of_vertices;
+    bool detection_flag;
+    bool is_convex;
 
 };
-
-//Mat detect_color(const Mat& input_image, int LOW_H, int LOW_S, int LOW_V,int HIGH_H, int HIGH_S, int HIGH_V);
-//Mat combine_images(const Mat& input_image1,const Mat& input_image2);
-//ContourDataT find_contours(const Mat& input_image);
-//bool detect_boundary(terpcopter_comm::DetectBoundary::Request  &request,
-//         terpcopter_comm::DetectBoundary::Response &response);
 
 ///////////////////////////////////////////
 //
@@ -109,6 +108,22 @@ struct ContourDataT
 //
 /////////////////////////////////////////
 
-ros::ServiceServer boundary_detection_service;
+ros::ServiceServer boundary_detection_service, home_base_detection_service;
+
+///////////////////////////////////////////
+//
+//	FUNCTIONS
+//
+/////////////////////////////////////////
+
+
+Mat detect_color(const Mat& input_image, int LOW_H, int LOW_S, int LOW_V,int HIGH_H, int HIGH_S, int HIGH_V, bool morphological_operation);
+Mat combine_images(const Mat& input_image1, const Mat& input_image2);
+ContourDataT find_contours(const Mat& input_image);
+bool detect_boundary(terpcopter_comm::DetectObject::Request  &request,
+         terpcopter_comm::DetectObject::Response &response);
+bool detect_home_base(terpcopter_comm::DetectObject::Request  &request,
+         terpcopter_comm::DetectObject::Response &response);
+
 
 #endif // TERPCOPTER_VISION_SERVER_H_

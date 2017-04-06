@@ -26,7 +26,7 @@ add_message_files(
 
 add_service_files(
   DIRECTORY srv
-  FILES SetCameraInfo.srv DetectBoundary.srv ServoSweep.srv
+  FILES SetCameraInfo.srv DetectObject.srv ServoSweep.srv
 )
 
 generate_messages(

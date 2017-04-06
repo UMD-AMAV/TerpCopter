@@ -36,12 +36,14 @@
 ///////////////////////////////////////////
 
 // Detect a particular color based on the corresponding H , S , V values
-Mat detect_color(const Mat& input_image, int LOW_H, int LOW_S, int LOW_V,int HIGH_H, int HIGH_S, int HIGH_V)
+Mat detect_color(const Mat& input_image, int LOW_H, int LOW_S, int LOW_V,int HIGH_H, int HIGH_S, int HIGH_V, bool morphological_operation = true)
 {
   Mat thresholded_image;
 
   inRange(input_image, Scalar( LOW_H, LOW_S, LOW_V), Scalar(HIGH_H, HIGH_S, HIGH_V), thresholded_image); //Threshold the image
-      
+   
+  if(morphological_operation)   
+  {
   //morphological opening (remove small objects from the foreground)
   erode(thresholded_image, thresholded_image, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
   dilate( thresholded_image, thresholded_image, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
@@ -49,6 +51,7 @@ Mat detect_color(const Mat& input_image, int LOW_H, int LOW_S, int LOW_V,int HIG
   //morphological closing (fill small holes in the foreground)
   dilate( thresholded_image, thresholded_image, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
   erode(thresholded_image, thresholded_image, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+  }
   
   return thresholded_image;
 
@@ -75,7 +78,6 @@ ContourDataT find_contours(const Mat& input_image)
 {
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
-
   vector<Point> largest_contour;
   int largest_contour_id;
   float largest_contour_length;
@@ -83,48 +85,49 @@ ContourDataT find_contours(const Mat& input_image)
   int largest_contour_center_x;
   int largest_contour_center_y;
   int number_of_contours;
+  int number_of_vertices;
 
   ContourDataT contour_data;
 
   //Random Number Generator
   RNG rng(12345);
 
-
   //Find all the contours in the image
-  findContours( input_image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
- 
- /// Draw contours
+ findContours( input_image, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
   Mat image_of_contours = Mat::zeros( input_image.size(), CV_8UC3 );
 
-  for( int i = 0; i< contours.size(); i++ )
-  {
-       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-       drawContours( image_of_contours , contours, i, color, 2, 8, hierarchy, 0, Point() );
-  }
-   
-
   number_of_contours = contours.size();
-
   
   if (number_of_contours > 0 )
   {
-
 	  float previous_area = 0.0;
 	  float current_area = 0.0;
+	  int current_number_of_vertices = 0;
 
 	  // Find contour with largest area
-	  for( int i = 0; i < contours.size(); i++ )
+	  for( int i = 0; i < number_of_contours ; i++ )
 	     { 
+      		cv::approxPolyDP(cv::Mat(contours[i]), contours[i], cv::arcLength(cv::Mat(contours[i]), true)*0.01, true);
+
+		// Draw contours
+       		Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+       		drawContours( image_of_contours , contours, i, color, 2, 8, hierarchy, 0, Point() );
+
 		current_area = contourArea(contours[i]);
+		current_number_of_vertices = contours[i].size();
 	
 		if ( current_area > previous_area )
 		{
 			largest_contour_area = current_area;
-			largest_contour_id = i;	
+			largest_contour_id = i;
+			number_of_vertices = current_number_of_vertices;	
 			previous_area = current_area;	
 		}
 
 	     }
+
+	   cv::Rect r = cv::boundingRect(contours[largest_contour_id]);
 
 	   largest_contour = contours[largest_contour_id];
 	   largest_contour_length = arcLength(largest_contour , true );
@@ -141,7 +144,11 @@ ContourDataT find_contours(const Mat& input_image)
 	   contour_data.area = largest_contour_area;
 	   contour_data.arc_length = largest_contour_length;
 	   contour_data.number_of_contours = number_of_contours;
-
+	   contour_data.number_of_vertices = number_of_vertices;
+	   contour_data.width = r.width;
+	   contour_data.height = r.height;
+	   contour_data.is_convex = isContourConvex(contours[largest_contour_id]);
+	   contour_data.detection_flag = true;
    }
 
    else
@@ -152,11 +159,26 @@ ContourDataT find_contours(const Mat& input_image)
 	 contour_data.area = 0;
 	 contour_data.arc_length = 0;
 	 contour_data.number_of_contours = 0;
+	 contour_data.number_of_vertices = 0;
+	 contour_data.width = 0;
+	 contour_data.height = 0;
+	 contour_data.is_convex = false;
+	 contour_data.detection_flag = false;
    }
    
-   ROS_INFO("Server : Center X = %d, Center Y = %d, Area = %f",largest_contour_center_x,largest_contour_center_y,largest_contour_area);
+   if(contour_data.detection_flag)
+   	ROS_INFO("Server : Center X = %d, Center Y = %d, Area = %f, Vertices = %d, isConvex = %d",largest_contour_center_x,largest_contour_center_y,largest_contour_area, number_of_vertices, contour_data.is_convex);
+   else
+	ROS_INFO(" Cannot detect a contour ");
 
    return contour_data;
+
+// Circle Detection Constraints
+//    int radius = r.width / 2;
+
+//    if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 &&
+//        std::abs(1 - (area / (CV_PI * (radius*radius)))) <= 0.2)
+//        setLabel(dst, "CIR", contours[i]);
 
 }
 
@@ -167,8 +189,8 @@ ContourDataT find_contours(const Mat& input_image)
 //
 ///////////////////////////////////////////
 
-bool detect_boundary(terpcopter_comm::DetectBoundary::Request  &request,
-         terpcopter_comm::DetectBoundary::Response &response)
+bool detect_boundary(terpcopter_comm::DetectObject::Request  &request,
+         terpcopter_comm::DetectObject::Response &response)
 {
 
   cv_bridge::CvImagePtr image_ptr;
@@ -214,13 +236,70 @@ bool detect_boundary(terpcopter_comm::DetectBoundary::Request  &request,
   std::string image_path = ros::package::getPath("terpcopter_vision") + "/results/boundary_detection.jpg";
   imwrite( image_path, largest_contour_data.image_of_contours );
 
-  if(largest_contour_data.number_of_contours > 0 && largest_contour_data.area > CONTOUR_AREA_THRESHOLD)
+  if(largest_contour_data.number_of_contours > 0 && largest_contour_data.area > CONTOUR_AREA_THRESHOLD && largest_contour_data.is_convex)
   {
 	response.detection_flag = true;
 	response.center_x_pixel = largest_contour_data.center_x;
 	response.center_y_pixel = largest_contour_data.center_y;
 	response.area = largest_contour_data.area;
 	response.arc_length = largest_contour_data.arc_length;
+	response.width = largest_contour_data.width;
+	response.height = largest_contour_data.height;
+
+  }
+ else
+  {
+ 	response.detection_flag = false;
+  }
+
+  return true;
+}
+
+bool detect_home_base(terpcopter_comm::DetectObject::Request  &request,
+         terpcopter_comm::DetectObject::Response &response)
+{
+
+  cv_bridge::CvImagePtr image_ptr;
+  Mat input_image, hsv_image, yellow_image, black_image, combined_image,detected_image;
+
+  ContourDataT largest_contour_data;
+
+  try
+  {
+    image_ptr = cv_bridge::toCvCopy( request.input_image , sensor_msgs::image_encodings::BGR8);
+  }
+  catch (cv_bridge::Exception& e)
+  {
+    ROS_ERROR("cv_bridge exception: %s", e.what());
+    return false;
+  }
+
+  input_image = image_ptr->image;
+
+  //Convert to HSV Format
+  cvtColor(input_image, hsv_image, COLOR_BGR2HSV);
+
+  //Detect Black color
+  black_image = detect_color(hsv_image, LOW_H_BLACK, LOW_S_BLACK, LOW_V_BLACK, HIGH_H_BLACK, HIGH_S_BLACK, HIGH_V_BLACK );
+
+  //Improve Contrast by equalizing the historgram
+  equalizeHist(  black_image, black_image );
+ 
+  //Find the largest contour in the image and send the response to the client
+  largest_contour_data = find_contours(black_image);
+
+  std::string image_path = ros::package::getPath("terpcopter_vision") + "/results/home_base_detection.jpg";
+  imwrite( image_path, largest_contour_data.image_of_contours );
+
+  if(largest_contour_data.number_of_contours > 0 && largest_contour_data.area > CONTOUR_AREA_THRESHOLD && largest_contour_data.number_of_vertices == 12 && !largest_contour_data.is_convex)
+  {
+	response.detection_flag = true;
+	response.center_x_pixel = largest_contour_data.center_x;
+	response.center_y_pixel = largest_contour_data.center_y;
+	response.area = largest_contour_data.area;
+	response.arc_length = largest_contour_data.arc_length;
+	response.width = largest_contour_data.width;
+	response.height = largest_contour_data.height;
 
   }
  else
@@ -243,7 +322,8 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   boundary_detection_service = n.advertiseService("detect_boundary", detect_boundary);
-  ROS_INFO("Ready to detect boundary");
+  home_base_detection_service = n.advertiseService("detect_home_base", detect_home_base);
+  ROS_INFO("Ready to detect boundary and home base");
 
   ros::spin();
 
