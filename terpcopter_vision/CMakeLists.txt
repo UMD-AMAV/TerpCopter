@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-find_package(OpenCV 3 REQUIRED HINTS ${OpenCV_DIR} NO_DEFAULT_PATH)
+#find_package(OpenCV 3 REQUIRED HINTS ${OpenCV_DIR} NO_DEFAULT_PATH)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -150,8 +150,8 @@ add_dependencies(terpcopter_vision_client terpcopter_comm_gencpp)
 # target_link_libraries(terpcopter_vision_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(terpcopter_vision_server  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
-target_link_libraries(terpcopter_vision_client  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
+target_link_libraries(terpcopter_vision_server  ${catkin_LIBRARIES}) # ${OpenCV_LIBRARIES} )
+target_link_libraries(terpcopter_vision_client  ${catkin_LIBRARIES}) #${OpenCV_LIBRARIES} )
 
 #############
 ## Install ##
