@@ -52,6 +52,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin
   - sudo apt-get install ros-indigo-opencv3 ros-indigo-camera-info-manager ros-indigo-cv-bridge libeigen3-dev ros-indigo-mavros
+  - sudo apt-get autoremove libopencv2.4
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Prepare rosdep to install dependencies.
   - sudo rosdep init
